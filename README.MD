@@ -47,17 +47,24 @@ instruction this is JSONstruct file:
 	}
 	
 path - name field from json struct
+
 key:value - if find field with name = "key" and field with value = "value" - return "ret" field value
+
 	["name":"inetnum","value":"10.0.0.0 - 10.255.255.255"]
+	
 split - split recieved string and save part by name_i
+
 match - sometimes under filter fit many fields - by match their may sift inappropriate
+
 replace - regexp expression for replace recieved string
 
 	
 #FLAGS
 
 (-l)input file - CSV or ip list separate line ending((\r\n)|(\r)|(\n))
+
 (-r)output file - CSV
+
 you may set output file same input - the result will be stored properly appending fields
 
 (-a)you may set ALL mode - this mode rewrite existing line - default false
