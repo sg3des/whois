@@ -55,6 +55,7 @@ replace - regexp expression for replace recieved string
 
 	
 #FLAGS
+
 (-l)input file - CSV or ip list separate line ending((\r\n)|(\r)|(\n))
 (-r)output file - CSV
 you may set output file same input - the result will be stored properly appending fields
