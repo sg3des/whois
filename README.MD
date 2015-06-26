@@ -1,5 +1,5 @@
 #WHOIS DATA FOR IP
-	This is script write on GO(golang)
+	This script is written on GO(golang)
 	
 Data gathering from any online json service by file instruction and save this into CSV file
 
