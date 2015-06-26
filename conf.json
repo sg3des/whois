@@ -1,0 +1,69 @@
+{
+	"Sep": ";",
+	"Fields": [{
+		"Url": "http://rest.db.ripe.net/search.json?query-string=%s",
+		"Filter": {
+			"inet": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "inetnum",
+				"ret": "value",
+				"split": "-"
+			},
+			"descr": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "descr",
+				"ret": "value"
+			},
+			"country": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "country",
+				"ret": "value"
+			},
+			"domain": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "remarks",
+				"ret": "value",
+				"regexp": "@",
+				"replace": ".*@"
+			},
+			"netname": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "netname",
+				"ret": "value"
+			}
+		}
+	}, {
+		"Url": "http://rest.db.ripe.net/search.json?query-string=%s&flags=resource",
+		"Filter": {
+			"AS": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "origin",
+				"ret": "value"
+			},
+			"netsize": {
+				"path": ["objects", "object", "attributes", "attribute", "name"],
+				"key": "name",
+				"value": "route",
+				"ret": "value"
+			}
+		}
+	}],
+	"Length": 9,
+	"SaveOrder": {
+		"ip": 0,
+		"inet_0": 1,
+		"inet_1": 2,
+		"descr": 3,
+		"country": 4,
+		"domain": 5,
+		"netname": 6,
+		"AS": 7,
+		"netsize": 8
+	}
+}
