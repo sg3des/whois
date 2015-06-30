@@ -48,12 +48,12 @@ type tFilter struct {
 }
 
 func init() {
-	flag.StringVar(&ListIp, "l", "listip.csv", "set path to csv file with ip addresses")
+	flag.StringVar(&ListIp, "i", "listip.csv", "set path to csv file with ip addresses")
 	flag.BoolVar(&All, "a", false, "enable mode all for update information for existing element")
-	flag.StringVar(&Resultfile, "r", "result.csv", "set path to file where save result")
+	flag.StringVar(&Resultfile, "o", "result.csv", "set path to file where save result")
 	flag.Parse()
 
-	b, err := ioutil.ReadFile("conf.json")
+	b, err := ioutil.ReadFile("conf3.json")
 	checkerr(err, "error read conf.json")
 	err = json.Unmarshal(b, &Conf)
 	checkerr(err, "error parse json structure in conf.json")
@@ -93,8 +93,10 @@ func main() {
 				}
 
 				for key, filter := range field.Filter {
+					// fmt.Println(filter)
 					_, ret := search(jsonbody, filter, 0)
 					// data[i][]
+					// fmt.Println(ret)
 					if len(filter.Split) > 0 {
 						aret := regexp.MustCompile(filter.Split).Split(ret, -1)
 						for j := 0; j < len(aret); j++ {
@@ -105,6 +107,7 @@ func main() {
 					}
 				}
 			}
+			// fmt.Println(line)
 			linesave(line, ip)
 			// fmt.Println(ip)
 			// os.Exit(0)
@@ -158,27 +161,30 @@ func request(ip string, url string) (*gabs.Container, error) {
 func search(data *gabs.Container, filter tFilter, i int) (*gabs.Container, string) {
 	var ret string //returned value
 	filter.Path = filter.Path[i:]
-	// fmt.Println("I:::", i, filter.Path, reflect.TypeOf(data.Data()).String())
-	// fmt.Println(data)
+	//fmt.Println("I:::", i, filter.Path, reflect.TypeOf(data.Data()).String())
+	//fmt.Println(data)
+	// fmt.Println(data.Search(filter.Key).String())
+	if len(filter.Value) > 0 {
+		if data.Search(filter.Key).Data() == filter.Value {
+			ret = data.Search(filter.Ret).Data().(string)
 
-	if data.Search(filter.Key).Data() == filter.Value {
-		ret = data.Search(filter.Ret).Data().(string)
+			if len(filter.Match) > 0 {
 
-		if len(filter.Match) > 0 {
+				if regexp.MustCompile(filter.Match).MatchString(ret) {
+					if len(filter.Replace) > 0 {
+						ret = regexp.MustCompile(filter.Replace).ReplaceAllString(ret, "")
+					}
+					return data, ret
+				} else {
+					ret = ""
+				}
 
-			if regexp.MustCompile(filter.Match).MatchString(ret) {
-
+			} else {
 				if len(filter.Replace) > 0 {
 					ret = regexp.MustCompile(filter.Replace).ReplaceAllString(ret, "")
 				}
-
 				return data, ret
-			} else {
-				ret = ""
 			}
-
-		} else {
-			return data, ret
 		}
 	}
 
@@ -211,14 +217,20 @@ func linesave(line []string, ip string) {
 	checkerr(err, "error read result file")
 	sline := strings.Join(line, Conf.Sep) + "\r\n"
 
-	if regexp.MustCompile("(?m)^" + regexp.QuoteMeta(ip) + "((\r\n)|(\r)|(\n))|;").Match(filedata) {
+	// fmt.Println(string(filedata), sline)
+
+	if regexp.MustCompile("(?m)^" + regexp.QuoteMeta(ip) + "((;)|((\r\n)|\r|\n)|$)").Match(filedata) {
+		// fmt.Println("match", ip)
 		exp, err := regexp.Compile("(?m)^" + regexp.QuoteMeta(ip) + "((;;*.*((\r\n)|(\r)|(\n)))|((\r\n)|(\r)|(\n)))")
 		checkerr(err, "error create regexp for: "+ip)
 
 		filedata = exp.ReplaceAll(filedata, []byte(sline))
 	} else {
+		// fmt.Println("notmatch", ip)
 		filedata = []byte(string(filedata) + sline)
 	}
+	// fmt.Println(string(filedata))
+	// fmt.Println("========================")
 	err = ioutil.WriteFile(Resultfile, filedata, 0755)
 	checkerr(err, "error write to file result")
 }
